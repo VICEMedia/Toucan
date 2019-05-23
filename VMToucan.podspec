@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name = 'VMToucan'
-  s.version = '1.1.1'
+  s.version = '1.1.2'
   s.license = 'MIT'
   s.summary = 'Fabulous Image Processing in Swift'
   s.homepage = 'https://github.com/VICEMedia/mobile-ios-toucan'
