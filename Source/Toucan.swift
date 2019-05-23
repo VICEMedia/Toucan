@@ -36,7 +36,7 @@ import CoreGraphics
  let resizedAndMaskedImage = Toucan(withImage: myImage).resize(CGSize(width: 100, height: 150)).maskWithEllipse().image
  */
 public class Toucan : NSObject {
-    
+
     #if swift(>=4.2)
     internal typealias ImageOrientation = UIImage.Orientation
     #else
@@ -130,6 +130,21 @@ public class Toucan : NSObject {
     public struct Resize {
         
         /**
+         CropMode is a custom enum added by VICEMedia to enable different cropping options
+         **/
+        public enum CropMode {
+            case topLeft
+            case topCenter
+            case topRight
+            case centerLeft
+            case center
+            case centerRight
+            case bottomLeft
+            case bottomCenter
+            case bottomRight
+        }
+        
+        /**
          FitMode drives the resizing process to determine what to do with an image to
          make it fit the given size bounds.
          
@@ -197,6 +212,66 @@ public class Toucan : NSObject {
                 return Util.drawImageInBounds(resizedImage!, bounds: CGRect(x: 0, y: 0, width: size.width, height: size.height))
             }
         }
+        
+        /**
+        This is a custom function added by VICEMedia via a fork of the original repository.
+         
+         Crop an image with an optional crop mode.
+         
+         - parameter image:   Image to Resize
+         - parameter cropSize:    Size of the cropped image
+         - parameter cropMode: How to crop th image
+         **/
+        public static func cropImage(_ image: UIImage, cropSize: CGSize, cropMode: CropMode = .center) -> UIImage? {
+            
+            if (cropSize.width >= image.size.width || cropSize.height >= image.size.height) { //cannot crop an image that's larger than the original size
+                return image
+            }
+            
+            var croppedRect: CGRect = CGRect(origin: .zero, size: .zero)
+            
+            switch (cropMode) {
+            case .topLeft:
+                croppedRect = CGRect(x: 0,
+                                     y: 0,
+                                     width: cropSize.width, height: cropSize.height)
+            case .topCenter:
+                croppedRect = CGRect(x: (image.size.width - cropSize.width) / 2,
+                                     y: 0,
+                                     width: cropSize.width, height: cropSize.height)
+            case .topRight:
+                croppedRect = CGRect(x: image.size.width - cropSize.width,
+                                     y: 0,
+                                     width: cropSize.width, height: cropSize.height)
+            case .centerLeft:
+                croppedRect = CGRect(x: 0,
+                                     y: (image.size.height - cropSize.height) / 2,
+                                     width: cropSize.width, height: cropSize.height)
+            case .center:
+                croppedRect = CGRect(x: (image.size.width - cropSize.width) / 2,
+                                     y: (image.size.height - cropSize.height) / 2,
+                                     width: cropSize.width, height: cropSize.height)
+            case .centerRight:
+                croppedRect = CGRect(x: image.size.width - cropSize.width,
+                                     y: (image.size.height - cropSize.height) / 2,
+                                     width: cropSize.width, height: cropSize.height)
+            case .bottomLeft:
+                croppedRect = CGRect(x: 0,
+                                     y: image.size.height - cropSize.height,
+                                     width: cropSize.width, height: cropSize.height)
+            case .bottomCenter:
+                croppedRect = CGRect(x: (image.size.width - cropSize.width) / 2,
+                                     y: image.size.height - cropSize.height,
+                                     width: cropSize.width, height: cropSize.height)
+            case .bottomRight:
+                croppedRect = CGRect(x: image.size.width - cropSize.width,
+                                     y: image.size.height - cropSize.height,
+                                     width: cropSize.width, height: cropSize.height)
+            }
+            
+            return Util.croppedImageWithRect(image, rect: croppedRect)
+        }
+        
     }
     
     // MARK: - Mask
