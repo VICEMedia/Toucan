@@ -125,24 +125,26 @@ public class Toucan : NSObject {
     }
     
     /**
+     Resize the contained image to the specified size by scaling the image to fit the
+     constraining dimensions exactly.
+     
+     The current image on this toucan instance is replaced with the resized image.
+     
+     - parameter size:    Size to resize the image to
+     
+     - returns: Self, allowing method chaining
+     */
+    public func crop(_ cropSize: CGSize, cropMode: Crop.CropMode = .center) -> Toucan {
+        if let image = self.image {
+            self.image = Toucan.Crop.cropImage(image, cropSize: cropSize, cropMode: cropMode)
+        }
+        return self
+    }
+    
+    /**
      Container struct for all things Resize related
      */
     public struct Resize {
-        
-        /**
-         CropMode is a custom enum added by VICEMedia to enable different cropping options
-         **/
-        public enum CropMode {
-            case topLeft
-            case topCenter
-            case topRight
-            case centerLeft
-            case center
-            case centerRight
-            case bottomLeft
-            case bottomCenter
-            case bottomRight
-        }
         
         /**
          FitMode drives the resizing process to determine what to do with an image to
@@ -213,10 +215,31 @@ public class Toucan : NSObject {
             }
         }
         
+    }
+    
+    /**
+     Customized by VICE: Container struct cropping the image
+     */
+    public struct Crop {
+        
         /**
-        This is a custom function added by VICEMedia via a fork of the original repository.
-         
-         Crop an image with an optional crop mode.
+         Customized by VICE: CropMode is an enum added to enable different cropping options
+         **/
+        public enum CropMode {
+            case topLeft
+            case topCenter
+            case topRight
+            case centerLeft
+            case center
+            case centerRight
+            case bottomLeft
+            case bottomCenter
+            case bottomRight
+        }
+        
+        
+        /**
+         Customized by VICE: Crop an image with an optional crop mode.
          
          - parameter image:   Image to Resize
          - parameter cropSize:    Size of the cropped image
